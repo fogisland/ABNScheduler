@@ -315,14 +315,22 @@ private class ABNQueue : NSObject {
     ///Save queue on disk.
     ///- returns: The success of the saving operation.
     private func save() -> Bool {
-        return NSKeyedArchiver.archiveRootObject(self.notifQueue, toFile: ArchiveURL.path!)
+        if let ArchiveURL = ArchiveURL {
+            return NSKeyedArchiver.archiveRootObject(self.notifQueue, toFile: ArchiveURL.path!)
+        } else {
+            return true
+        }
     }
     
     ///Load queue from disk.
     ///Called first when instantiating the ABNQueue singleton.
     ///You do not need to manually call this method and therefore do not declare it as public.
     private func load() -> [ABNotification]? {
-        return NSKeyedUnarchiver.unarchiveObjectWithFile(ArchiveURL.path!) as? Array<ABNotification>
+        if let ArchiveURL = ArchiveURL {
+            return NSKeyedUnarchiver.unarchiveObjectWithFile(ArchiveURL.path!) as? Array<ABNotification>
+        } else {
+            return []
+        }
     }
     
 }
@@ -530,7 +538,7 @@ public func ==(lhs: ABNotification, rhs: ABNotification) -> Bool {
 
 //MARK: NSDate
 
-extension NSDate: Comparable {
+extension NSDate {
     
     /**
      Add a number of minutes to a date.
@@ -598,14 +606,6 @@ extension NSDate: Comparable {
         return date
     }
     
-}
-
-public func <(lhs: NSDate, rhs: NSDate) -> Bool {
-    return lhs.compare(rhs) == NSComparisonResult.OrderedAscending
-}
-
-public func ==(lhs: NSDate, rhs: NSDate) -> Bool {
-    return lhs.compare(rhs) == NSComparisonResult.OrderedSame
 }
 
 //MARK: Int
